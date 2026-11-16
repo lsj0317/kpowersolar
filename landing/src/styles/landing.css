@@ -491,11 +491,17 @@
   font-size: 14px;
   font-weight: 700;
 }
+/* 모바일·태블릿: 글자를 위, 사진을 아래 오른쪽에 (글자 칸이 좁아지지 않도록) */
+.a-bento__card {
+  flex-direction: column;
+}
 .a-bento__img {
-  flex: 0 0 42%;
-  align-self: flex-end;
-  height: 140px;
-  margin: 0 -28px -28px 12px;
+  flex: none;
+  /* 사진의 원래 비율 때문에 칸이 넓어지는 것을 막음 */
+  min-width: 0;
+  width: 72%;
+  height: 160px;
+  margin: var(--space-6) -28px -28px auto;
   border-top-left-radius: var(--radius-card-sm);
 }
 .a-bento__card--main .a-bento__text {
@@ -549,7 +555,14 @@
   .a-bento__card:not(.a-bento__card--main) {
     padding: 32px;
   }
+  /* 데스크톱 오른쪽 작은 카드: 글자와 사진을 나란히 */
+  .a-bento__card:not(.a-bento__card--main) {
+    flex-direction: row;
+  }
   .a-bento__card:not(.a-bento__card--main) .a-bento__img {
+    flex: 0 0 42%;
+    width: auto;
+    align-self: flex-end;
     height: 70%;
     margin: 0 -32px -32px 16px;
   }
