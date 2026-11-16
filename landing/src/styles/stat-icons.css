@@ -16,18 +16,21 @@
   position: relative;
   /* 떨어지는 동전이 카드 밖으로 보이지 않도록 */
   overflow: hidden;
-  --si-size: 44px;
-  --si-inset: 18px;
+  --si-size: 72px;
+  --si-inset: 24px;
 }
-.a-stat:has(.stat-ic) .a-stat__label {
-  padding-right: calc(var(--si-size) + 8px);
+/* 아이콘 자리만큼 글자 영역 오른쪽을 비움 */
+.a-stat:has(.stat-ic) {
+  padding-right: calc(var(--si-size) + var(--si-inset) + 16px);
 }
+/* 카드 오른쪽, 세로 가운데 */
 .stat-ic {
   position: absolute;
-  top: var(--si-inset);
+  top: 50%;
   right: var(--si-inset);
   width: var(--si-size);
   height: var(--si-size);
+  margin-top: calc(var(--si-size) / -2);
   color: currentColor;
   pointer-events: none;
 }
@@ -40,10 +43,25 @@
 .stat-ic svg * {
   transform-box: view-box;
 }
+/* 휴대폰: 카드를 한 줄에 하나씩 (아이콘을 글자 옆에 둘 자리 확보) */
+/* landing.css 가 이 파일보다 나중에 로드되므로 선택자 우선순위를 높여 둠 */
+@media (max-width: 639px) {
+  .a-stats:has(.stat-ic) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .a-stats > .a-stat {
+    min-height: 128px;
+  }
+}
 @media (min-width: 1024px) {
   .a-stat {
-    --si-size: 64px;
-    --si-inset: 28px;
+    --si-size: 104px;
+    --si-inset: 40px;
+  }
+  /* 큰 카드(누적 설치 용량)는 더 크게 */
+  .a-stats > .a-stat:first-child {
+    --si-size: 128px;
+    --si-inset: 56px;
   }
 }
 @media (hover: hover) and (pointer: fine) {
