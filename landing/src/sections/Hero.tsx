@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Photo } from '@/components/Photo';
 import { ArrowIcon } from '@/components/Icons';
 import { telHref } from '@/data/company';
@@ -8,34 +8,78 @@ interface Slide {
   title: [string, string];
   desc: string;
   image?: string;
+  /** 배경 동영상 (mp4, 소리 없음). 있으면 image 대신 재생 */
+  video?: string;
+  /** 동영상 로딩 전·동작 줄이기 설정 시 보여줄 정지 화면 */
+  poster?: string;
   alt: string;
 }
 
-/** 히어로 슬라이드. image 에 드론 항공사진(16:9, 텍스트 쪽이 어두운 사진)을 넣습니다. */
+/**
+ * 히어로 슬라이드. image 에 드론 항공사진(16:9) 또는 video 에 8초 내외 무음 영상을 넣습니다.
+ * 현재 영상은 임시(Pexels 무료 영상): 2249554(드론), 1276083(노을)
+ */
 const SLIDES: Slide[] = [
   {
     id: 'lease',
     title: ['놀고 있는 공장 지붕,', '이제 매년 임대료를 받으세요'],
     desc: '부산·울산·경남 공장 지붕 태양광. 설치비 부담 없이 지붕만 빌려주시면 됩니다.',
+    video: '/video/hero-drone.mp4',
+    poster: '/video/hero-drone.jpg',
     alt: '공장 지붕 태양광 발전소 준공 항공사진',
   },
   {
     id: 'grid',
     title: ['한전 선로 조회부터', '준공 후 관리까지 한 번에'],
     desc: '우리 공장에 설치가 가능한지, 한전 선로 여유부터 무료로 확인해 드립니다.',
-    alt: '공장 지붕 태양광 패널 시공 현장 사진',
+    video: '/video/hero-sunset.mp4',
+    poster: '/video/hero-sunset.jpg',
+    alt: '노을 지는 태양광 발전소',
   },
 ];
 
-const AUTOPLAY_MS = 6000;
+/** 영상 길이(8초)에 맞춘 슬라이드 전환 간격 */
+const AUTOPLAY_MS = 8000;
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** 보이는 슬라이드만 처음부터 재생하고, 나머지는 멈춰 둡니다. */
+function HeroVideo({ src, poster, active, priority }: { src: string; poster?: string; active: boolean; priority: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (active && !prefersReducedMotion()) {
+      v.currentTime = 0;
+      v.play().catch(() => {});
+    } else {
+      v.pause();
+    }
+  }, [active]);
+
+  return (
+    <video
+      ref={ref}
+      className="photo hero__bg"
+      src={src}
+      poster={poster}
+      muted
+      loop
+      playsInline
+      preload={priority ? 'auto' : 'metadata'}
+      aria-hidden="true"
+    />
+  );
+}
 
 export function Hero() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (paused || reduce) return;
+    if (paused || prefersReducedMotion()) return;
     const t = window.setTimeout(() => setIndex((i) => (i + 1) % SLIDES.length), AUTOPLAY_MS);
     return () => window.clearTimeout(t);
   }, [index, paused]);
@@ -62,7 +106,11 @@ export function Hero() {
           aria-roledescription="slide"
           aria-label={`${i + 1} / ${SLIDES.length}`}
         >
-          <Photo className="hero__bg" src={s.image} alt={s.alt} priority={i === 0} placeholderLabel="히어로 드론 사진 (2400×1350)" />
+          {s.video ? (
+            <HeroVideo src={s.video} poster={s.poster} active={i === index} priority={i === 0} />
+          ) : (
+            <Photo className="hero__bg" src={s.image} alt={s.alt} priority={i === 0} placeholderLabel="히어로 드론 사진 (2400×1350)" />
+          )}
           <div className="hero__overlay" />
         </div>
       ))}
