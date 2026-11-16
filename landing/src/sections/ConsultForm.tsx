@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { COMPANY, telHref } from '@/data/company';
 import { submitConsultation } from '@/services/consultations';
-import { REGIONS, type ConsultationInput, type Region } from '@/types/domain';
+import { REGIONS, ROOF_AREA_RANGES, ROOF_TYPES, type ConsultationInput, type Region } from '@/types/domain';
 
 type Status = 'idle' | 'submitting' | 'done' | 'error';
 type Errors = Partial<Record<'name' | 'phone' | 'agreePrivacy', string>>;
@@ -11,6 +11,8 @@ const initial: ConsultationInput = {
   phone: '',
   region: '',
   roofAreaPyeong: null,
+  roofType: '',
+  roofAreaRange: '',
   message: '',
   agreePrivacy: false,
 };
@@ -21,6 +23,43 @@ function validate(v: ConsultationInput): Errors {
   if (!/^0\d{8,10}$/.test(v.phone.replace(/[^0-9]/g, ''))) e.phone = '연락처를 정확히 입력해 주세요.';
   if (!v.agreePrivacy) e.agreePrivacy = '개인정보 수집·이용에 동의해 주세요.';
   return e;
+}
+
+/** 탭해서 고르는 선택지 (라디오 버튼을 칩 모양으로) */
+function ChipGroup({
+  name,
+  legend,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  legend: string;
+  options: readonly string[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <fieldset className="field chip-group">
+      <legend>{legend}</legend>
+      <div className="chip-group__list">
+        {options.map((o) => (
+          <label key={o} className="chip-opt">
+            <input
+              type="radio"
+              name={name}
+              value={o}
+              checked={value === o}
+              onChange={() => onChange(o)}
+              // 이미 고른 칩을 다시 누르면 선택 해제
+              onClick={() => value === o && onChange('')}
+            />
+            <span>{o}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
 }
 
 function getUtmSource(): string | null {
@@ -125,42 +164,35 @@ export function ConsultForm() {
                 {errors.phone && <p id="f-phone-err" className="field__err">{errors.phone}</p>}
               </div>
 
-              <div className="form__row">
-                <div className="field">
-                  <label htmlFor="f-region">공장 지역</label>
-                  <select
-                    id="f-region"
-                    value={values.region}
-                    onChange={(e) => set('region', e.target.value as Region | '')}
-                  >
-                    <option value="">선택</option>
-                    {REGIONS.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="field">
-                  <label htmlFor="f-area">지붕 면적 (평)</label>
-                  <input
-                    id="f-area"
-                    type="number"
-                    inputMode="numeric"
-                    min={0}
-                    placeholder="예: 500"
-                    value={values.roofAreaPyeong ?? ''}
-                    onChange={(e) => set('roofAreaPyeong', e.target.value ? Number(e.target.value) : null)}
-                  />
-                </div>
-              </div>
+              <ChipGroup
+                name="region"
+                legend="공장 지역"
+                options={REGIONS}
+                value={values.region}
+                onChange={(v) => set('region', v as Region | '')}
+              />
+              <ChipGroup
+                name="roofType"
+                legend="지붕 종류"
+                options={ROOF_TYPES}
+                value={values.roofType ?? ''}
+                onChange={(v) => set('roofType', v)}
+              />
+              <ChipGroup
+                name="roofArea"
+                legend="지붕 면적"
+                options={ROOF_AREA_RANGES}
+                value={values.roofAreaRange ?? ''}
+                onChange={(v) => set('roofAreaRange', v)}
+              />
 
               <div className="field">
-                <label htmlFor="f-msg">문의 내용</label>
+                <label htmlFor="f-msg">문의 내용 (선택)</label>
                 <textarea
                   id="f-msg"
                   rows={3}
-                  maxLength={2000}
+                  maxLength={1900}
+                  placeholder="정확한 면적, 원하시는 수익모델 등 자유롭게 적어 주세요."
                   value={values.message}
                   onChange={(e) => set('message', e.target.value)}
                 />
@@ -178,7 +210,7 @@ export function ConsultForm() {
                 <label htmlFor="f-agree">
                   개인정보 수집·이용에 동의합니다 (필수)
                   <small id="f-agree-desc">
-                    수집 항목: 성함, 연락처, 지역 · 목적: 상담 안내 · 보유기간: 상담 종료 후 1년{' '}
+                    수집 항목: 성함, 연락처, 지역, 지붕 정보 · 목적: 상담 안내 · 보유기간: 상담 종료 후 1년{' '}
                     <a href={COMPANY.privacyUrl}>전문 보기</a>
                   </small>
                 </label>

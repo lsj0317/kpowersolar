@@ -1,5 +1,5 @@
 import { Photo } from '@/components/Photo';
-import { QuoteIcon } from '@/components/Icons';
+import { AreaIcon, BoltIcon, QuoteIcon } from '@/components/Icons';
 import { SectionHeader } from '@/components/SectionHeader';
 import { COMPANY } from '@/data/company';
 import { useLatestSites } from '@/hooks/useData';
@@ -18,9 +18,11 @@ function toRailItems(sites: Site[]): RailItem[] {
 
 const fmt = (n: number) => (n > 0 ? n.toLocaleString('ko-KR') : '○○○');
 
+/** 연 임대료 표기: 1억 이상은 "약 1.45억 원", 미만은 "약 3,200만 원" */
 function formatLease(krw: number | null) {
-  if (!krw) return '연 임대료 약 ○,○○○만 원';
-  return `연 임대료 약 ${Math.round(krw / 10_000).toLocaleString('ko-KR')}만 원`;
+  if (!krw) return '약 ○,○○○만 원';
+  if (krw >= 100_000_000) return `약 ${(krw / 100_000_000).toFixed(2).replace(/\.?0+$/, '')}억 원`;
+  return `약 ${Math.round(krw / 10_000).toLocaleString('ko-KR')}만 원`;
 }
 
 function SiteCard({ site }: { site: Site }) {
@@ -39,13 +41,22 @@ function SiteCard({ site }: { site: Site }) {
           {site.region} · {SITE_MODEL_LABEL[site.model]}
         </p>
         <h3 className="site-card__name">{site.name}</h3>
-        <p className="site-card__spec">
-          지붕 {fmt(site.roofAreaPyeong)}평 · {fmt(site.capacityKw)}kW
+        <ul className="site-card__spec">
+          <li>
+            <AreaIcon />
+            <span className="sr-only">지붕 면적</span>
+            {fmt(site.roofAreaPyeong)}평{site.roofAreaM2 > 0 && ` (${fmt(site.roofAreaM2)}㎡)`}
+          </li>
+          <li>
+            <BoltIcon />
+            <span className="sr-only">발전 용량</span>
+            {fmt(site.capacityKw)}kW
+          </li>
+        </ul>
+        <p className="price-box">
+          <span>연 임대료</span>
+          <strong>{formatLease(site.annualLeaseKrw)}</strong>
         </p>
-        <div className="price-box">
-          {formatLease(site.annualLeaseKrw)}
-          <small>지붕 {fmt(site.roofAreaPyeong)}평 기준</small>
-        </div>
       </div>
     </article>
   );

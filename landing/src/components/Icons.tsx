@@ -42,3 +42,31 @@ export const QuoteIcon = ({ size = 32 }: IconProps) => (
     />
   </svg>
 );
+
+export const PauseIcon = ({ size = 18 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M8 5v14M16 5v14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+  </svg>
+);
+
+export const PlayIcon = ({ size = 18 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M8 5.5v13a.8.8 0 0 0 1.2.7l10.2-6.5a.8.8 0 0 0 0-1.4L9.2 4.8A.8.8 0 0 0 8 5.5Z" fill="currentColor" />
+  </svg>
+);
+
+/** 면적 (모서리 꺾쇠) */
+export const AreaIcon = ({ size = 16 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3" y="3" width="18" height="18" rx="5" fill="currentColor" />
+    <path d="M8 16 16 8M11 8h5v5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+/** 발전 용량 (번개) */
+export const BoltIcon = ({ size = 16 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <rect x="3" y="3" width="18" height="18" rx="5" fill="currentColor" />
+    <path d="M13 6.5 8.5 13H12l-1 4.5 4.5-6.5H12l1-4.5Z" fill="#fff" />
+  </svg>
+);
