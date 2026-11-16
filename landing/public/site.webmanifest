@@ -1,0 +1,12 @@
+{
+  "name": "케이파워 솔라",
+  "short_name": "케이파워 솔라",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#1B2A6B"
+}

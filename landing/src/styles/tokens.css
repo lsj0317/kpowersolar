@@ -1,0 +1,77 @@
+/* ==========================================================
+   디자인 토큰 — KPOWER_DESIGN_GUIDE.md 1장 · 3-2장 기준 (A안)
+   ========================================================== */
+:root {
+  /* 레이아웃 */
+  --container: 1320px;
+  --gutter: 20px;
+  --section-y: 64px;
+  --header-h: 60px;
+
+  /* 간격 (8px 기반) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-16: 64px;
+
+  /* 반경 (A안: 둥글게) */
+  --radius-card: 24px;
+  --radius-card-sm: 20px;
+  --radius-pill: 999px;
+
+  /* 컬러 — A안 랜딩 */
+  --a-brand: #1b2a6b;
+  --a-brand-dark: #0e1847;
+  --a-ink: #1a1a1a;
+  --a-text: #333333;
+  --a-sub: #555555;
+  --a-muted: #777777;
+  --a-line: #eeeeee;
+  --a-bg: #ffffff;
+  --a-bg-soft: #f6f7f9;
+  --a-dark: #1e2533;
+
+  --a-mint: #e9f5ee;
+  --a-mint-ink: #3d5a49;
+  --a-sky: #e7eef8;
+  --a-sky-ink: #3a4a66;
+  --a-lavender: #f1eefa;
+  --a-lavender-ink: #4c4566;
+  --a-sand: #edeae4;
+  --a-cream: #f3efe8;
+  --a-price-bg: #eef2fa;
+
+  --a-overlay: rgba(10, 16, 30, 0.45);
+
+  /* 브랜드 연결 포인트 (로고 심볼) */
+  --sun: #e8641b;
+
+  /* 타이포 (3-3) */
+  --fs-h1: clamp(30px, 4.2vw, 52px);
+  --fs-h2: clamp(24px, 3vw, 38px);
+  --fs-card: clamp(20px, 2vw, 26px);
+  --fs-stat: clamp(28px, 3vw, 36px);
+  --fs-body: 15px;
+  --fs-caption: 13px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+    --section-y: 88px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 40px;
+    --section-y: 112px;
+    --header-h: 76px;
+    --fs-body: 16px;
+  }
+}
