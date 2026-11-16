@@ -1,0 +1,365 @@
+/* =========================================================
+   실적 카드 애니메이션 아이콘 (components/StatIcon.tsx)
+   - 정지 상태 = 완성된 모습. .a-stat.is-playing 동안 한 번 재생
+   - 데스크톱(마우스): 카드에 올릴 때마다 재생
+   - 터치 기기: 화면에 들어올 때 한 번 + 탭하면 다시 재생
+   - 동작 줄이기 설정: 재생하지 않음 (StatsBento.tsx 에서 처리)
+   ========================================================= */
+
+@property --pct {
+  syntax: '<integer>';
+  inherits: true;
+  initial-value: 100;
+}
+
+.a-stat {
+  position: relative;
+  /* 떨어지는 동전이 카드 밖으로 보이지 않도록 */
+  overflow: hidden;
+  --si-size: 44px;
+  --si-inset: 18px;
+}
+.a-stat:has(.stat-ic) .a-stat__label {
+  padding-right: calc(var(--si-size) + 8px);
+}
+.stat-ic {
+  position: absolute;
+  top: var(--si-inset);
+  right: var(--si-inset);
+  width: var(--si-size);
+  height: var(--si-size);
+  color: currentColor;
+  pointer-events: none;
+}
+.stat-ic svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.stat-ic svg * {
+  transform-box: view-box;
+}
+@media (min-width: 1024px) {
+  .a-stat {
+    --si-size: 64px;
+    --si-inset: 28px;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  .a-stat:has(.stat-ic) {
+    cursor: default;
+  }
+}
+
+/* ---------- 누적 설치 용량: 배터리 0 → 100% ---------- */
+.si-battery__fill {
+  fill: #8fd6a8;
+  transform-origin: 8px 32px;
+}
+.si-battery__bolt {
+  transform-origin: 56px 31px;
+}
+.si-battery__pct {
+  position: absolute;
+  left: 37.5%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: calc(var(--si-size) * 0.17);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  counter-reset: pct var(--pct);
+}
+.si-battery__pct::after {
+  content: counter(pct) '%';
+}
+.a-stat.is-playing .si-battery__fill {
+  animation: si-battery-fill 1.8s cubic-bezier(0.3, 0.6, 0.4, 1) both;
+}
+.a-stat.is-playing .si-battery__pct {
+  animation: si-battery-pct 1.8s cubic-bezier(0.3, 0.6, 0.4, 1) both;
+}
+.a-stat.is-playing .si-battery__bolt {
+  animation: si-battery-bolt 1.8s ease both;
+}
+@keyframes si-battery-fill {
+  0% { transform: scaleX(0); }
+  75%, 100% { transform: scaleX(1); }
+}
+@keyframes si-battery-pct {
+  0% { --pct: 0; }
+  75%, 100% { --pct: 100; }
+}
+@keyframes si-battery-bolt {
+  0%, 70% { opacity: 0.25; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1.25); }
+  90%, 100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- 준공 현장: 굴삭기가 흙을 퍼 올림 ---------- */
+.si-exc__boom { transform-origin: 30px 36px; }
+.si-exc__arm { transform-origin: 44px 18px; }
+.si-exc__bucket { transform-origin: 54px 32px; }
+.si-exc__dirt { opacity: 0; }
+.a-stat.is-playing .si-exc__boom { animation: si-exc-boom 2.2s ease-in-out both; }
+.a-stat.is-playing .si-exc__arm { animation: si-exc-arm 2.2s ease-in-out both; }
+.a-stat.is-playing .si-exc__bucket { animation: si-exc-bucket 2.2s ease-in-out both; }
+.a-stat.is-playing .si-exc__dirt { animation: si-exc-dirt 2.2s linear both; }
+@keyframes si-exc-boom {
+  0% { transform: rotate(0); }
+  25%, 40% { transform: rotate(14deg); }
+  70%, 85% { transform: rotate(-12deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes si-exc-arm {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(18deg); }
+  45% { transform: rotate(4deg); }
+  70%, 85% { transform: rotate(-6deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes si-exc-bucket {
+  0%, 28% { transform: rotate(0); }
+  45%, 82% { transform: rotate(-38deg); }
+  92% { transform: rotate(20deg); }
+  100% { transform: rotate(0); }
+}
+@keyframes si-exc-dirt {
+  0%, 38% { opacity: 0; }
+  45%, 84% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+
+/* ---------- 지급한 임대료: 손바닥에 동전이 떨어짐 ---------- */
+.a-stat.is-playing .si-coin--1 { animation: si-coin-1 1.8s ease-in both; }
+.a-stat.is-playing .si-coin--2 { animation: si-coin-2 1.8s ease-in both; }
+.a-stat.is-playing .si-coin--3 { animation: si-coin-3 1.8s ease-in both; }
+@keyframes si-coin-1 {
+  0% { transform: translateY(-40px); opacity: 0; }
+  8% { opacity: 1; }
+  30% { transform: translateY(0); }
+  36% { transform: translateY(-4px); }
+  42%, 100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes si-coin-2 {
+  0%, 18% { transform: translateY(-40px); opacity: 0; }
+  26% { opacity: 1; }
+  48% { transform: translateY(0); }
+  54% { transform: translateY(-4px); }
+  60%, 100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes si-coin-3 {
+  0%, 36% { transform: translateY(-40px); opacity: 0; }
+  44% { opacity: 1; }
+  66% { transform: translateY(0); }
+  72% { transform: translateY(-4px); }
+  78%, 100% { transform: translateY(0); opacity: 1; }
+}
+
+/* ---------- 상담 기업: 따르릉, 수화기가 들썩임 ---------- */
+.si-tel__handset { transform-origin: 32px 30px; }
+.si-tel__ring { opacity: 0; }
+.a-stat.is-playing .si-tel__handset { animation: si-tel-lift 1.8s ease-in-out both; }
+.a-stat.is-playing .si-tel__ring { animation: si-tel-ring 1.8s linear both; }
+@keyframes si-tel-lift {
+  0% { transform: none; }
+  8% { transform: translateY(-7px) rotate(-9deg); }
+  14% { transform: translateY(-7px) rotate(9deg); }
+  20% { transform: translateY(-7px) rotate(-9deg); }
+  26% { transform: translateY(-7px) rotate(9deg); }
+  32% { transform: translateY(-7px) rotate(-7deg); }
+  38% { transform: translateY(-7px) rotate(7deg); }
+  44% { transform: translateY(-7px) rotate(-5deg); }
+  50% { transform: translateY(-7px) rotate(5deg); }
+  56% { transform: translateY(-8px) rotate(0); }
+  80%, 100% { transform: none; }
+}
+@keyframes si-tel-ring {
+  0% { opacity: 0; }
+  8%, 22% { opacity: 1; }
+  26%, 30% { opacity: 0.2; }
+  34%, 50% { opacity: 1; }
+  60%, 100% { opacity: 0; }
+}
+
+/* ---------- 시공 지역: 지구본 한 바퀴 ---------- */
+.si-globe__m {
+  transform-origin: 32px 32px;
+  /* 납작해져도(scaleX 0) 선 두께 유지 */
+  vector-effect: non-scaling-stroke;
+}
+.si-globe__m--1 { transform: scaleX(-0.500); opacity: 1; }
+.si-globe__m--2 { transform: scaleX(0.500); opacity: 1; }
+.si-globe__m--3 { transform: scaleX(1.000); opacity: 1; }
+.si-globe__m--4 { transform: scaleX(0.500); opacity: 0.25; }
+.si-globe__m--5 { transform: scaleX(-0.500); opacity: 0.25; }
+.si-globe__m--6 { transform: scaleX(-1.000); opacity: 1; }
+.a-stat.is-playing .si-globe__m--1 { animation: si-globe-1 2.4s linear both; }
+.a-stat.is-playing .si-globe__m--2 { animation: si-globe-2 2.4s linear both; }
+.a-stat.is-playing .si-globe__m--3 { animation: si-globe-3 2.4s linear both; }
+.a-stat.is-playing .si-globe__m--4 { animation: si-globe-4 2.4s linear both; }
+.a-stat.is-playing .si-globe__m--5 { animation: si-globe-5 2.4s linear both; }
+.a-stat.is-playing .si-globe__m--6 { animation: si-globe-6 2.4s linear both; }
+@keyframes si-globe-1 {
+  0.00% { transform: scaleX(-0.500); opacity: 1; }
+  4.17% { transform: scaleX(-0.259); opacity: 1; }
+  8.33% { transform: scaleX(0.040); opacity: 1; }
+  12.50% { transform: scaleX(0.259); opacity: 1; }
+  16.67% { transform: scaleX(0.500); opacity: 1; }
+  20.83% { transform: scaleX(0.707); opacity: 1; }
+  25.00% { transform: scaleX(0.866); opacity: 1; }
+  29.17% { transform: scaleX(0.966); opacity: 1; }
+  33.33% { transform: scaleX(1.000); opacity: 1; }
+  37.50% { transform: scaleX(0.966); opacity: 0.25; }
+  41.67% { transform: scaleX(0.866); opacity: 0.25; }
+  45.83% { transform: scaleX(0.707); opacity: 0.25; }
+  50.00% { transform: scaleX(0.500); opacity: 0.25; }
+  54.17% { transform: scaleX(0.259); opacity: 0.25; }
+  58.33% { transform: scaleX(0.040); opacity: 0.25; }
+  62.50% { transform: scaleX(-0.259); opacity: 0.25; }
+  66.67% { transform: scaleX(-0.500); opacity: 0.25; }
+  70.83% { transform: scaleX(-0.707); opacity: 0.25; }
+  75.00% { transform: scaleX(-0.866); opacity: 0.25; }
+  79.17% { transform: scaleX(-0.966); opacity: 0.25; }
+  83.33% { transform: scaleX(-1.000); opacity: 1; }
+  87.50% { transform: scaleX(-0.966); opacity: 1; }
+  91.67% { transform: scaleX(-0.866); opacity: 1; }
+  95.83% { transform: scaleX(-0.707); opacity: 1; }
+  100.00% { transform: scaleX(-0.500); opacity: 1; }
+}
+@keyframes si-globe-2 {
+  0.00% { transform: scaleX(0.500); opacity: 1; }
+  4.17% { transform: scaleX(0.707); opacity: 1; }
+  8.33% { transform: scaleX(0.866); opacity: 1; }
+  12.50% { transform: scaleX(0.966); opacity: 1; }
+  16.67% { transform: scaleX(1.000); opacity: 1; }
+  20.83% { transform: scaleX(0.966); opacity: 0.25; }
+  25.00% { transform: scaleX(0.866); opacity: 0.25; }
+  29.17% { transform: scaleX(0.707); opacity: 0.25; }
+  33.33% { transform: scaleX(0.500); opacity: 0.25; }
+  37.50% { transform: scaleX(0.259); opacity: 0.25; }
+  41.67% { transform: scaleX(0.040); opacity: 0.25; }
+  45.83% { transform: scaleX(-0.259); opacity: 0.25; }
+  50.00% { transform: scaleX(-0.500); opacity: 0.25; }
+  54.17% { transform: scaleX(-0.707); opacity: 0.25; }
+  58.33% { transform: scaleX(-0.866); opacity: 0.25; }
+  62.50% { transform: scaleX(-0.966); opacity: 0.25; }
+  66.67% { transform: scaleX(-1.000); opacity: 1; }
+  70.83% { transform: scaleX(-0.966); opacity: 1; }
+  75.00% { transform: scaleX(-0.866); opacity: 1; }
+  79.17% { transform: scaleX(-0.707); opacity: 1; }
+  83.33% { transform: scaleX(-0.500); opacity: 1; }
+  87.50% { transform: scaleX(-0.259); opacity: 1; }
+  91.67% { transform: scaleX(-0.040); opacity: 1; }
+  95.83% { transform: scaleX(0.259); opacity: 1; }
+  100.00% { transform: scaleX(0.500); opacity: 1; }
+}
+@keyframes si-globe-3 {
+  0.00% { transform: scaleX(1.000); opacity: 1; }
+  4.17% { transform: scaleX(0.966); opacity: 0.25; }
+  8.33% { transform: scaleX(0.866); opacity: 0.25; }
+  12.50% { transform: scaleX(0.707); opacity: 0.25; }
+  16.67% { transform: scaleX(0.500); opacity: 0.25; }
+  20.83% { transform: scaleX(0.259); opacity: 0.25; }
+  25.00% { transform: scaleX(0.040); opacity: 0.25; }
+  29.17% { transform: scaleX(-0.259); opacity: 0.25; }
+  33.33% { transform: scaleX(-0.500); opacity: 0.25; }
+  37.50% { transform: scaleX(-0.707); opacity: 0.25; }
+  41.67% { transform: scaleX(-0.866); opacity: 0.25; }
+  45.83% { transform: scaleX(-0.966); opacity: 0.25; }
+  50.00% { transform: scaleX(-1.000); opacity: 1; }
+  54.17% { transform: scaleX(-0.966); opacity: 1; }
+  58.33% { transform: scaleX(-0.866); opacity: 1; }
+  62.50% { transform: scaleX(-0.707); opacity: 1; }
+  66.67% { transform: scaleX(-0.500); opacity: 1; }
+  70.83% { transform: scaleX(-0.259); opacity: 1; }
+  75.00% { transform: scaleX(-0.040); opacity: 1; }
+  79.17% { transform: scaleX(0.259); opacity: 1; }
+  83.33% { transform: scaleX(0.500); opacity: 1; }
+  87.50% { transform: scaleX(0.707); opacity: 1; }
+  91.67% { transform: scaleX(0.866); opacity: 1; }
+  95.83% { transform: scaleX(0.966); opacity: 1; }
+  100.00% { transform: scaleX(1.000); opacity: 1; }
+}
+@keyframes si-globe-4 {
+  0.00% { transform: scaleX(0.500); opacity: 0.25; }
+  4.17% { transform: scaleX(0.259); opacity: 0.25; }
+  8.33% { transform: scaleX(0.040); opacity: 0.25; }
+  12.50% { transform: scaleX(-0.259); opacity: 0.25; }
+  16.67% { transform: scaleX(-0.500); opacity: 0.25; }
+  20.83% { transform: scaleX(-0.707); opacity: 0.25; }
+  25.00% { transform: scaleX(-0.866); opacity: 0.25; }
+  29.17% { transform: scaleX(-0.966); opacity: 0.25; }
+  33.33% { transform: scaleX(-1.000); opacity: 1; }
+  37.50% { transform: scaleX(-0.966); opacity: 1; }
+  41.67% { transform: scaleX(-0.866); opacity: 1; }
+  45.83% { transform: scaleX(-0.707); opacity: 1; }
+  50.00% { transform: scaleX(-0.500); opacity: 1; }
+  54.17% { transform: scaleX(-0.259); opacity: 1; }
+  58.33% { transform: scaleX(-0.040); opacity: 1; }
+  62.50% { transform: scaleX(0.259); opacity: 1; }
+  66.67% { transform: scaleX(0.500); opacity: 1; }
+  70.83% { transform: scaleX(0.707); opacity: 1; }
+  75.00% { transform: scaleX(0.866); opacity: 1; }
+  79.17% { transform: scaleX(0.966); opacity: 1; }
+  83.33% { transform: scaleX(1.000); opacity: 1; }
+  87.50% { transform: scaleX(0.966); opacity: 0.25; }
+  91.67% { transform: scaleX(0.866); opacity: 0.25; }
+  95.83% { transform: scaleX(0.707); opacity: 0.25; }
+  100.00% { transform: scaleX(0.500); opacity: 0.25; }
+}
+@keyframes si-globe-5 {
+  0.00% { transform: scaleX(-0.500); opacity: 0.25; }
+  4.17% { transform: scaleX(-0.707); opacity: 0.25; }
+  8.33% { transform: scaleX(-0.866); opacity: 0.25; }
+  12.50% { transform: scaleX(-0.966); opacity: 0.25; }
+  16.67% { transform: scaleX(-1.000); opacity: 1; }
+  20.83% { transform: scaleX(-0.966); opacity: 1; }
+  25.00% { transform: scaleX(-0.866); opacity: 1; }
+  29.17% { transform: scaleX(-0.707); opacity: 1; }
+  33.33% { transform: scaleX(-0.500); opacity: 1; }
+  37.50% { transform: scaleX(-0.259); opacity: 1; }
+  41.67% { transform: scaleX(-0.040); opacity: 1; }
+  45.83% { transform: scaleX(0.259); opacity: 1; }
+  50.00% { transform: scaleX(0.500); opacity: 1; }
+  54.17% { transform: scaleX(0.707); opacity: 1; }
+  58.33% { transform: scaleX(0.866); opacity: 1; }
+  62.50% { transform: scaleX(0.966); opacity: 1; }
+  66.67% { transform: scaleX(1.000); opacity: 1; }
+  70.83% { transform: scaleX(0.966); opacity: 0.25; }
+  75.00% { transform: scaleX(0.866); opacity: 0.25; }
+  79.17% { transform: scaleX(0.707); opacity: 0.25; }
+  83.33% { transform: scaleX(0.500); opacity: 0.25; }
+  87.50% { transform: scaleX(0.259); opacity: 0.25; }
+  91.67% { transform: scaleX(0.040); opacity: 0.25; }
+  95.83% { transform: scaleX(-0.259); opacity: 0.25; }
+  100.00% { transform: scaleX(-0.500); opacity: 0.25; }
+}
+@keyframes si-globe-6 {
+  0.00% { transform: scaleX(-1.000); opacity: 1; }
+  4.17% { transform: scaleX(-0.966); opacity: 1; }
+  8.33% { transform: scaleX(-0.866); opacity: 1; }
+  12.50% { transform: scaleX(-0.707); opacity: 1; }
+  16.67% { transform: scaleX(-0.500); opacity: 1; }
+  20.83% { transform: scaleX(-0.259); opacity: 1; }
+  25.00% { transform: scaleX(-0.040); opacity: 1; }
+  29.17% { transform: scaleX(0.259); opacity: 1; }
+  33.33% { transform: scaleX(0.500); opacity: 1; }
+  37.50% { transform: scaleX(0.707); opacity: 1; }
+  41.67% { transform: scaleX(0.866); opacity: 1; }
+  45.83% { transform: scaleX(0.966); opacity: 1; }
+  50.00% { transform: scaleX(1.000); opacity: 1; }
+  54.17% { transform: scaleX(0.966); opacity: 0.25; }
+  58.33% { transform: scaleX(0.866); opacity: 0.25; }
+  62.50% { transform: scaleX(0.707); opacity: 0.25; }
+  66.67% { transform: scaleX(0.500); opacity: 0.25; }
+  70.83% { transform: scaleX(0.259); opacity: 0.25; }
+  75.00% { transform: scaleX(0.040); opacity: 0.25; }
+  79.17% { transform: scaleX(-0.259); opacity: 0.25; }
+  83.33% { transform: scaleX(-0.500); opacity: 0.25; }
+  87.50% { transform: scaleX(-0.707); opacity: 0.25; }
+  91.67% { transform: scaleX(-0.866); opacity: 0.25; }
+  95.83% { transform: scaleX(-0.966); opacity: 0.25; }
+  100.00% { transform: scaleX(-1.000); opacity: 1; }
+}
