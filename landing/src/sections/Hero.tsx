@@ -3,6 +3,18 @@ import { Photo } from '@/components/Photo';
 import { ArrowIcon, PauseIcon, PlayIcon } from '@/components/Icons';
 import { telHref } from '@/data/company';
 
+/** 히어로 예시 숫자. 금액은 data/services.ts 의 회사 기준 금액과 같아야 합니다. */
+interface SlideFigure {
+  /** 숫자 앞 문장 (예: 공장 지붕 2,000평이면) */
+  lead: string;
+  /** 크게 보여줄 금액 */
+  value: string;
+  /** 금액 뒤 설명 */
+  unit: string;
+  /** 숫자 아래 기준 (작은 글씨) */
+  basis: string;
+}
+
 interface Slide {
   id: string;
   title: [string, string];
@@ -13,6 +25,7 @@ interface Slide {
   /** 동영상 로딩 전·동작 줄이기 설정 시 보여줄 정지 화면 */
   poster?: string;
   alt: string;
+  figure?: SlideFigure;
 }
 
 /**
@@ -26,6 +39,12 @@ const SLIDES: Slide[] = [
     desc: '부산·울산·경남 공장 지붕 태양광. 설치비 부담 없이 지붕만 빌려주시면 됩니다.',
     video: '/video/hero-drone.mp4',
     poster: '/video/hero-drone.jpg',
+    figure: {
+      lead: '공장 지붕 2,000평이면',
+      value: '3억 5천만 원',
+      unit: '5년 치 임대료를 먼저',
+      basis: '*발전용량 1,000kW · 임대료 선지급형 기준, 2026년 10월 기준 예시',
+    },
     alt: '공장 지붕 태양광 발전소 준공 항공사진',
   },
   {
@@ -34,6 +53,12 @@ const SLIDES: Slide[] = [
     desc: '우리 공장에 설치가 가능한지, 한전 선로 여유부터 무료로 확인해 드립니다.',
     video: '/video/hero-sunset.mp4',
     poster: '/video/hero-sunset.jpg',
+    figure: {
+      lead: '공장 지붕 2,000평에 직접 지으면',
+      value: '연 약 3억 원',
+      unit: '발전 수익',
+      basis: '*발전용량 1,000kW · 발전소 구축형 기준, 2026년 10월 기준 예시',
+    },
     alt: '노을 지는 태양광 발전소',
   },
 ];
@@ -112,9 +137,11 @@ export function Hero() {
       className="hero"
       aria-roledescription="carousel"
       aria-label="주요 안내"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
+      // 마우스를 올려둔 동안만 잠시 멈춤 (터치 기기는 탭할 때 mouseenter 만 생기고 leave 가 없어 제외)
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setPaused(true)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && setPaused(false)}
+      // 키보드로 들어온 포커스일 때만 잠시 멈춤 (마우스·터치로 버튼을 누른 뒤에도 계속 넘어가도록)
+      onFocusCapture={(e) => (e.target as HTMLElement).matches(':focus-visible') && setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
       {SLIDES.map((s, i) => (
@@ -142,6 +169,16 @@ export function Hero() {
             {SLIDES[index].title[1]}
           </h1>
           <p className="hero__desc">{SLIDES[index].desc}</p>
+          {SLIDES[index].figure && (
+            <div className="hero__figure">
+              <p className="hero__figure-lead">{SLIDES[index].figure.lead}</p>
+              <p className="hero__figure-main">
+                <strong>{SLIDES[index].figure.value}</strong>
+                <span>{SLIDES[index].figure.unit}</span>
+              </p>
+              <p className="hero__figure-basis">{SLIDES[index].figure.basis}</p>
+            </div>
+          )}
           <div className="hero__btns">
             <a className="btn btn--outline-light" href="#consult">
               무료 상담 신청
