@@ -54,6 +54,10 @@ export interface ConsultationInput {
   roofAreaPyeong?: number | null;
   message?: string;
   agreePrivacy: boolean;
+  /** 지붕 종류 (선택 칩). DB 에는 문의 내용 앞에 함께 저장 */
+  roofType?: string;
+  /** 지붕 면적 구간 (선택 칩). DB 에는 문의 내용 앞에 함께 저장 */
+  roofAreaRange?: string;
   /** 광고 유입 추적용 (utm_source 등) */
   source?: string | null;
 }
@@ -72,3 +76,7 @@ export const SITE_STATUS_LABEL: Record<SiteStatus, string> = {
 };
 
 export const REGIONS: Region[] = ['부산', '울산', '김해', '양산', '창원', '기타'];
+
+/** 상담 폼 선택지 */
+export const ROOF_TYPES = ['샌드위치 패널', '징크', '컬러강판', '슬레이트', '콘크리트 평지붕', '잘 모름'] as const;
+export const ROOF_AREA_RANGES = ['300평 미만', '300~1,000평', '1,000~3,000평', '3,000평 이상', '잘 모름'] as const;

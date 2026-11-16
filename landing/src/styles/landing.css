@@ -408,6 +408,10 @@
 .hero__arrow:hover {
   background: rgba(255, 255, 255, 0.12);
 }
+.hero__toggle {
+  margin-left: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
 
 @media (min-width: 768px) {
   .hero {
@@ -604,6 +608,8 @@
 }
 
 .rail-card {
+  /* 카드 안의 절대 위치 요소(.sr-only 등)가 가로 스크롤 밖으로 새지 않도록 */
+  position: relative;
   display: flex;
   flex-direction: column;
   border-radius: var(--radius-card-sm);
@@ -654,24 +660,44 @@
   color: var(--a-ink);
 }
 .site-card__spec {
-  font-size: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
   color: var(--a-sub);
 }
+.site-card__spec li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.site-card__spec svg {
+  flex: none;
+  color: var(--a-brand);
+}
+/* 연 임대료 강조 배지 */
 .price-box {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
   margin-top: auto;
   padding: 14px 16px;
   border-radius: 12px;
   background: var(--a-price-bg);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--a-brand);
-}
-.price-box small {
-  font-size: 12px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--a-sub);
+}
+.price-box strong {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--a-brand);
 }
 
 .review-card {
@@ -918,6 +944,62 @@
 .field__err {
   font-size: 13px;
   color: #c62828;
+}
+/* 탭 선택 칩 (상담 폼) */
+.chip-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.chip-group legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--a-ink);
+}
+.chip-group__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip-opt {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+.chip-opt input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.chip-opt span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #d6d9df;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  font-size: 15px;
+  color: var(--a-text);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.chip-opt:hover span {
+  border-color: var(--a-brand);
+}
+.chip-opt input:checked + span {
+  border-color: var(--a-brand);
+  background: var(--a-brand);
+  color: #fff;
+  font-weight: 700;
+}
+.chip-opt input:focus-visible + span {
+  outline: 3px solid rgba(27, 42, 107, 0.35);
+  outline-offset: 2px;
 }
 .field--check {
   grid-template-columns: auto 1fr;

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Photo } from '@/components/Photo';
-import { ArrowIcon } from '@/components/Icons';
+import { ArrowIcon, PauseIcon, PlayIcon } from '@/components/Icons';
 import { telHref } from '@/data/company';
 
 interface Slide {
@@ -44,20 +44,36 @@ const AUTOPLAY_MS = 8000;
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** 보이는 슬라이드만 처음부터 재생하고, 나머지는 멈춰 둡니다. */
-function HeroVideo({ src, poster, active, priority }: { src: string; poster?: string; active: boolean; priority: boolean }) {
+/** 보이는 슬라이드만 재생합니다. 슬라이드가 바뀌면 처음부터, 일시정지 후에는 이어서 재생. */
+function HeroVideo({
+  src,
+  poster,
+  active,
+  playing,
+  priority,
+}: {
+  src: string;
+  poster?: string;
+  active: boolean;
+  playing: boolean;
+  priority: boolean;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
+
+  // 슬라이드에 새로 들어오면 처음부터
+  useEffect(() => {
+    if (active && ref.current) ref.current.currentTime = 0;
+  }, [active]);
 
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (active && !prefersReducedMotion()) {
-      v.currentTime = 0;
+    if (active && playing && !prefersReducedMotion()) {
       v.play().catch(() => {});
     } else {
       v.pause();
     }
-  }, [active]);
+  }, [active, playing]);
 
   return (
     <video
@@ -76,13 +92,16 @@ function HeroVideo({ src, poster, active, priority }: { src: string; poster?: st
 
 export function Hero() {
   const [index, setIndex] = useState(0);
+  /** 마우스·포커스가 올라가 있는 동안 잠시 멈춤 */
   const [paused, setPaused] = useState(false);
+  /** 사용자가 일시정지 버튼으로 멈춤 (다시 누를 때까지 유지) */
+  const [stopped, setStopped] = useState(false);
 
   useEffect(() => {
-    if (paused || prefersReducedMotion()) return;
+    if (paused || stopped || prefersReducedMotion()) return;
     const t = window.setTimeout(() => setIndex((i) => (i + 1) % SLIDES.length), AUTOPLAY_MS);
     return () => window.clearTimeout(t);
-  }, [index, paused]);
+  }, [index, paused, stopped]);
 
   const go = (d: number) => setIndex((i) => (i + d + SLIDES.length) % SLIDES.length);
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -107,7 +126,7 @@ export function Hero() {
           aria-label={`${i + 1} / ${SLIDES.length}`}
         >
           {s.video ? (
-            <HeroVideo src={s.video} poster={s.poster} active={i === index} priority={i === 0} />
+            <HeroVideo src={s.video} poster={s.poster} active={i === index} playing={!stopped} priority={i === 0} />
           ) : (
             <Photo className="hero__bg" src={s.image} alt={s.alt} priority={i === 0} placeholderLabel="히어로 드론 사진 (2400×1350)" />
           )}
@@ -144,6 +163,15 @@ export function Hero() {
           </span>
           <button type="button" className="hero__arrow" aria-label="다음 슬라이드" onClick={() => go(1)}>
             <ArrowIcon />
+          </button>
+          <button
+            type="button"
+            className="hero__arrow hero__toggle"
+            aria-label={stopped ? '자동 재생 시작' : '자동 재생 멈춤'}
+            aria-pressed={stopped}
+            onClick={() => setStopped((v) => !v)}
+          >
+            {stopped ? <PlayIcon /> : <PauseIcon />}
           </button>
         </div>
       </div>
